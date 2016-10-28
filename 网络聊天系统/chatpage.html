@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>聊天页面</title>
+    <link rel="stylesheet" type="text/css" href="bootstrap.css">
+    <script src="jquery-2.1.4.min.js"></script>
+    <style type="text/css">
+        body{
+            background-image: url("background.jpg") ;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        .menu_heading, .chat_heading{
+            padding: 10px;
+            margin-top: 1cm;
+            background-color: rgba(0,0,0,0.6);
+            /*background-color: rgb(51,122,183);*/
+            box-shadow:0 0 10px grey ;
+        }
+        .menu_body, .chat_body{
+            padding: 10px;
+            background-color: rgba(255,255,255,0.4);
+            box-shadow:0 0 10px grey ;
+            height: 550px;
+        }
+        a, p{
+            color: #ffffff;
+            display: inline-block;
+            font-size: 20px;
+            line-height: 20px;
+        }
+        /*鼠标悬浮在“退出”时颜色不变*/
+        .menu_heading a{
+            float: right;
+        }
+        .menu_heading a:hover{
+            color: #ffffff;
+            text-shadow: 0 0 10px grey;
+        }
+        /*好友列表半透明效果*/
+        /*.panel-default, .panel-default > .panel-heading{*/
+        /*background-color: rgba(255,255,255,0.2);*/
+        /*}*/
+        .friendlist{
+            height: 491px;
+            overflow-y: auto;
+            border: 1px solid rgba(0,0,0,0.4);
+        }
+        .friendlist > div{
+            margin: 10px;
+            font-size: 20px;
+        }
+        /*.panel-group, ul{*/
+        /*margin: 0;*/
+        /*}*/
+        /*鼠标悬浮在好友列表上时变成一只手，增加下划线*/
+        /*li:hover{*/
+        /*cursor: pointer;*/
+        /*text-decoration: underline;*/
+        /*}*/
+        .form-control{ /*聊天框和发送框禁止拖动，解决溢出*/
+            overflow-y: auto;
+            resize: none;
+            background-color: rgba(255,255,255,0.4);
+            border: 1px solid rgba(0,0,0,0.4);
+        }
+        .menu_body a{
+            color: rgb(51,51,51);
+            margin: 10px;
+        }
+        .menu_body a:hover{
+            text-decoration: underline;
+            cursor: pointer;
+            text-shadow: 0 0 10px grey;
+        }
+        /*聊天框*/
+        .chat_window{
+            height: 365px;
+            padding: 0;
+        }
+        .chat_window p{
+            font-size: 16px;
+            line-height: 16px;
+            color: rgb(51,51,51);
+        }
+        /*信息*/
+        /*.othermessage, .mymessage{*/
+        /*clear: both;*/
+        /*}*/
+        /*.mymessage{*/
+        /*float: right;*/
+        /*}*/
+        /*.othermessage{*/
+        /*float: left;*/
+        /*}*/
+        /*.mymessage p{*/
+        /*max-width: 680px;*/
+        /*color: rgb(85,85,85);*/
+        /*padding: 5px;*/
+        /*border-radius: 5px;*/
+        /*word-break:break-all;*/
+        /*background-color: rgba(51,122,183,0.2);*/
+        /*}*/
+        /*.othermessage p{*/
+        /*max-width: 680px;*/
+        /*color: rgb(85,85,85);*/
+        /*padding: 5px;*/
+        /*border-radius: 5px;*/
+        /*word-break:break-all;*/
+        /*background-color: rgba(51,122,183,0.2);*/
+        /*}*/
+        /*气泡尖角*/
+        .triangle-right {
+            width: 0;
+            height: 0;
+            border-top: 5px solid transparent;
+            border-left: 10px solid rgba(51,122,183,0.2);
+            border-bottom: 5px solid transparent;
+            float: right;
+            position: relative;
+            top: 15px;
+        }
+        .triangle-left {
+            width: 0;
+            height: 0;
+            border-top: 5px solid transparent;
+            border-right: 10px solid rgba(51,122,183,0.2);
+            border-bottom: 5px solid transparent;
+            float: left;
+            position: relative;
+            top: 15px;
+        }
+        /*关闭聊天窗*/
+        .myclose{
+            color: white;
+            display: inline-block;
+            font-size: 40px;
+            line-height: 30px;
+            float: right;
+            cursor: pointer;
+        }
+        .myclose:hover{
+            text-shadow: 0 0 10px grey;
+        }
+        .closetishi{
+            color: black;
+            display: inline-block;
+            font-size: 20px;
+            float: right;
+            cursor: pointer;
+        }
+        .myclose:hover{
+            text-shadow: 0 0 10px grey;
+        }
+        /*聊天框和发送框的分隔线*/
+        .divider{
+            margin: 10px auto;
+            background-color: rgba(0,0,0,0.4);
+            height: 1px;
+            border: none;
+        }
+        /*按钮*/
+        .btn{
+            width: 70px;
+            height: 40px;
+            margin: 10px auto;
+            float: right;
+        }
+
+        .tanchukuang{
+            height: 25px;
+            background-color: greenyellow;
+            position: absolute;
+            margin-top: 338px;
+            vertical-align: middle;
+            padding-left: 10px;
+            padding-right: 8px;
+            padding-top: 3px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /*-------------------------------------------------------------------好友列表相关-------------------------------------------------------------------*/
+        /*单个好友样式*/
+        .friend{
+            padding-top: 10px;
+            width: 338px;
+            height: 70px;
+            border-top: 1px solid rgba(255,255,255,1);
+        }
+        /*选择第一个label下的div子元素，去除边框*/
+        label:first-child > div{
+            border: none;
+        }
+        label{
+            display: block;
+            margin: 0;
+        }
+        /*好友名字*/
+        .friendname{
+            display: block;
+            color: rgb(51,51,51);
+            font-weight: normal;
+            font-size: 20px;
+        }
+        /*个性签名*/
+        .fuck{
+            font-weight: normal;
+            font-size: 16px;
+            color: rgb(127,127,127);
+            display: inline-block;
+            width: 213px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+        /*头像*/
+        img{
+            height: 50px;
+            width: 50px;
+            float: left;
+            margin: auto 10px;
+        }
+        /*消息*/
+        .badge{
+            margin-right: 20px;
+            background-color: rgb(245,108,11);
+        }
+        /*隐藏圆点*/
+        input{
+            position: absolute;
+            clip: rect(0px,0px,0px,0px);
+        }
+        /*悬浮和选择样式*/
+        .selected, .selected:hover{
+            background-color: rgba(255,165,0,0.5);
+        }
+        label:hover{
+            background-color: rgba(255,165,0,0.3);
+        }
+        /*-------------------------------------------------------------------好友列表相关-------------------------------------------------------------------*/
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 menu">
+            <div class="menu_heading">
+                <p class="username"></p>
+                <a href="/12.8login/login/loginpage.html">退出</a>
+            </div>
+            <div class="menu_body">
+                <div><a onclick="showchat()">聊天室</a></div>
+                <div class="friendlist"><!--好友列表-->
+                    <label>
+                        <input type="radio" name="friend">
+                        <div class="friend">
+                            <img src="" title="头像">
+                            <p class="friendname">张三</p>
+                            <p class="fuck">个性签名个性签名个性签名个性签名</p>
+                            <span class="badge pull-right">99+</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="friend">
+                        <div class="friend">
+                            <img src="" title="头像">
+                            <p class="friendname">李四</p>
+                            <p class="fuck">个性签名</p>
+                            <span class="badge pull-right">1</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="friend">
+                        <div class="friend">
+                            <img src="" title="头像">
+                            <p class="friendname">王五</p>
+                            <p class="fuck">个性签名</p>
+                            <span class="badge pull-right">10</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="friend">
+                        <div class="friend">
+                            <img src="" title="头像">
+                            <p class="friendname">张三</p>
+                            <p class="fuck">asdadaiduawioewa8oneyxw7ebxyaw7eawdx</p>
+                            <span class="badge pull-right">6</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="friend">
+                        <div class="friend">
+                            <img src="" title="头像">
+                            <p class="friendname">张三</p>
+                            <p class="fuck">hahahahahahahahahahahahahahahah</p>
+                            <span class="badge pull-right">6</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="friend">
+                        <div class="friend">
+                            <img src="" title="头像">
+                            <p class="friendname">张三</p>
+                            <p class="fuck">1111111111111111111111111111111111111111111111</p>
+                            <span class="badge pull-right">17</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="friend">
+                        <div class="friend">
+                            <img src="" title="头像">
+                            <p class="friendname">张三</p>
+                            <p class="fuck">qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq</p>
+                            <span class="badge pull-right">17</span>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="friend">
+                        <div class="friend">
+                            <img src="" title="头像">
+                            <p class="friendname">张三</p>
+                            <p class="fuck">iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii</p>
+                            <span class="badge pull-right">17</span>
+                        </div>
+                    </label>
+                </div><!--好友列表-->
+            </div>
+        </div>
+        <div class="col-md-8 chat">
+            <div class="chat_heading">
+                <p>聊天室</p>
+                <span class="myclose" onclick="closechat()">&times;</span><!--关闭聊天窗-->
+            </div>
+            <div class="chat_body">
+                <div class="form-control chat_window"><!--聊天框-->
+                    <div style='float: right;clear: both;'><div class='triangle-right'></div><p style='margin:10px 0 10px 0;padding: 5px;float:right; max-width: 650px;background-color: rgba(51,122,183,0.2);border-radius: 5px;word-break:break-all;'>用户名 2016-12-12 12:12:12<br>聊天信息聊天信息聊天信息聊天信息</p></div>
+                    <div style='float: right;clear: both;'><div class='triangle-right'></div><p style='margin:10px 0 10px 0;padding: 5px;float:right; max-width: 650px;background-color: rgba(51,122,183,0.2);border-radius: 5px;word-break:break-all;'>用户名 2016-12-12 12:12:12<br><span style='color: red;'>给用户名的私聊:</span>聊天信息聊天信息聊天信息聊天信息</p></div>
+                    <div class="tanchukuang"></div>
+                </div>
+                <hr class="divider"/> <!--聊天框和发送框的分隔线-->
+                <textarea rows="4" class="form-control msg" autofocus="autofocus"></textarea><!--发送框-->
+                <button type="submit" class="btn btn-primary" onclick="send()">发送</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--聊天窗口滚动条默认最底部-->
+<script>
+
+    var address;
+
+    var ws;
+
+    var username = "";
+
+    var trytimes = 0;
+
+    var punish = 0;
+//-------------------------------------------------------好友列表相关-----------------------------------------------------------------
+    $('label').each(function() {
+        $(this).click(function () {
+            $(this).addClass('selected');
+            $('label').not(this).removeClass('selected');
+        });
+    });
+//--------------------------------------------------------好友列表相关-----------------------------------------------------------------
+
+    $(function(){
+        setInterval(function(){
+            trytimes = 0;
+        },2000)
+    })
+
+    $(function(){
+        document.onkeydown = function(e){
+            if(e.ctrlKey && e.keyCode == 13){
+                send();
+                $(".msg").focus();
+            }
+        }
+    })
+
+    function getusername() {
+        var url = "../sever?method=getusername";
+        $.ajax({
+            type: "post",
+            url: url,
+            async: false,
+            success: function (data) {
+                username = data;
+            }
+        })
+        address = "ws://localhost:8080/12.8login/webchat?username=" + username;
+        $(".username").html("欢迎您：" + username + "！");
+    }
+
+    window.onbeforeunload = sendusername;
+
+    function sendusername(){
+        alert("fuckyou");
+        var url = "../sever?method=sendusername";
+        $.ajax({
+            type: "post",
+            url: url,
+            async: false,
+            data:{username:fuck},
+            success: function () {
+                alert("fuckyou");
+            }
+        })
+    }
+
+    window.onload = connect;
+
+    function connect() {
+
+        getusername();
+
+        if ('WebSocket' in window) {
+            ws = new WebSocket(address);
+        } else if ('MozWebSocket' in window) {
+            ws = new MozWebSocket(address);
+        } else {
+            alert('WebSocket is not supported by this browser.');
+            return;
+        }
+
+        youarein();
+
+        ws.onmessage = function (event) {
+
+            eval("var msg=" + event.data + ";");
+
+            if (undefined != msg.welcome) {
+                $(".chat_window").append("<div style='margin: 10px;'>" + msg.welcome + "</div><br>");
+                $(".chat_window").scrollTop($(".chat_window")[0].scrollHeight);
+            }
+            if (undefined != msg.usernames) {
+                $(".friendlist").html("");
+                $(msg.usernames).each(function () {
+                    $(".friendlist").append("<div><input type='checkbox' value='" + this + "'>" + this + "</div>");
+                });
+            }
+            if (undefined != msg.content) {
+                $(".chat_window").append("<div style='float: left;clear: both;'>" +
+                        "<div class='triangle-left'></div>" +
+                        "<p style='padding: 5px;margin: 10px 0 10px 0; border-radius: 5px;float:left; max-width: 650px;background-color: rgba(51,122,183,0.2);word-break:break-all;'>"
+                        + msg.content + "</p></div>");
+                $(".chat_window").scrollTop($(".chat_window")[0].scrollHeight);
+            }
+        }
+    }
+
+    function send() {
+
+        var msg = $(".msg").val();
+        msg = msg.replace(/\n/g,"<br>");
+
+        if(punish == 0){
+            if(trytimes < 5){
+                if(msg != ""){
+
+                    var mydate = new Date();
+                    var year = mydate.getFullYear();
+                    var month=mydate.getMonth() + 1;
+                    var date = mydate.getDate();
+                    var d=mydate.getDay();
+                    var h=mydate.getHours();
+                    var m=mydate.getMinutes();
+                    var s=mydate.getSeconds();
+                    month=month<10?"0"+month:month;
+                    date=date<10?"0"+date:date;
+                    h=h<10?"0"+h:h;
+                    m=m<10?"0"+m:m;
+                    s=s<10?"0"+s:s;
+
+                    var ss = $(".friendlist :checked");
+                    var obj = null;
+                    if (ss.size() == 0) {
+                        obj = {
+                            msg: msg,
+                            type: 1
+//          1为广播，2为单聊
+                        }
+                        var message = "<div style='float: right;clear: both;'><div class='triangle-right'></div><p style='margin:10px 0 10px 0;padding: 5px;float:right; max-width: 650px;background-color: rgba(51,122,183,0.2);border-radius: 5px;word-break:break-all;'>"+ username + " " + year + '-' + month + '-' + date + ' ' + h + ':' + m + ':' + s + "<br>" + $('.msg').val()+"</p></div>";
+                        message = message.replace(/\n/g,"<br>");
+                        $(".chat_window").append(message);
+                        $(".chat_window").scrollTop($(".chat_window")[0].scrollHeight);
+                    } else {
+                        var to = $(".friendlist :checked").val();
+                        obj = {
+                            to: to,
+                            msg: msg,
+                            type: 2
+//          1为广播，2为单聊
+                        }
+                        var message = "<div style='float: right;clear: both;'><div class='triangle-right'></div><p style='margin:10px 0 10px 0;padding: 5px;float:right; max-width: 650px;background-color: rgba(51,122,183,0.2);border-radius: 5px;word-break:break-all;'>"+ username + " " + year + '-' + month + '-' + date + ' ' + h + ':' + m + ':' + s + "<br>" + "<span style='color: red;'>"+"给" +  $(".friendlist :checked").val() + "的私聊:"+"</span>" + $('.msg').val()+"</p></div>";
+                        message = message.replace(/\n/g,"<br>");
+                        $(".chat_window").append(message);
+                        $(".chat_window").scrollTop($(".chat_window")[0].scrollHeight);
+                    }
+//        将对象转为json发送
+                    var str = JSON.stringify(obj);
+                    ws.send(str);
+                    $(".msg").val("");
+                    $(".msg").focus();
+                    addtrytimes();
+                }else{
+//                    alert("输入内容不能为空！");
+                    $(".tanchukuang").html("输入内容不能为空！");
+                    $(".tanchukuang").show();
+                    yanchiclosetanchukuang();
+                }
+            }else{
+                punish = 1;
+                repunished();
+//                alert("您发送得太快了，请休息一下吧~");
+                $(".tanchukuang").html("您发送得太快了，请休息一下吧~");
+                $(".tanchukuang").show();
+                yanchiclosetanchukuang();
+            }
+        }else{
+            punish = 1;
+//            alert("您发送得太快了，请休息一下吧~");
+            $(".tanchukuang").html("您发送得太快了，请休息一下吧~");
+            $(".tanchukuang").show();
+            yanchiclosetanchukuang();
+        }
+    }
+
+    function repunished(){
+        setTimeout(function(){
+            punish = 0;
+            trytimes = 0;
+        },5000)
+    }
+
+    function addtrytimes(){
+        trytimes++;
+    }
+
+    function closechat(){
+        $(".chat").hide();
+    }
+
+    function showchat(){
+        $(".chat").show();
+    }
+
+    function youarein(){
+        $(".chat_window").append("<div style='margin: 10px;'>" + "您已进入聊天室" + "</div>");
+    }
+
+    function yanchiclosetanchukuang(){
+        setTimeout(function(){
+            $(".tanchukuang").hide();
+        },1300);
+    }
+</script>
+</body>
+</html>

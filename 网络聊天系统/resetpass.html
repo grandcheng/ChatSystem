@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>忘记密码？</title>
+    <link rel="stylesheet" type="text/css" href="bootstrap.css">
+    <script src="jquery-2.1.4.min.js"></script>
+    <style>
+        body {
+            background-image: url("background.jpg");
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .info {
+            width: 350px;
+            height: 50px;
+            margin: 0 auto;
+            margin-top: 5cm;
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 10px grey;
+            border-left: 7px solid deepskyblue;
+        }
+
+        .info p {
+            font-size: 20px;
+            line-height: 30px;
+        }
+
+        .forget {
+            width: 350px;
+            margin: 0 auto;
+            margin-top: 20px;
+            padding: 40px;
+            background-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 10px grey;
+        }
+
+        .form-control {
+            width: 240px;
+            margin-bottom: 20px;
+            height: 40px;
+            font-size: 16px;
+            display: inline-block;
+        }
+
+        /*验证码输入框*/
+        #identifyingcode {
+            width: 120px;
+            display: inline-block;
+            margin-right: 17px;
+        }
+
+        /*验证码图像*/
+        #identifyingimg {
+            width: 100px;
+            height: 40px;
+            position: relative;
+            bottom: 1px;
+            display: inline-block;
+        }
+
+        /*显示图标*/
+        .dui1, .dui2, .cuo1, .cuo2 {
+            margin-left: 10px;
+            margin-top: 10px;
+            width: 16px;
+            height: 16px;
+            float: right;
+        }
+
+        form button {
+            width: 70px;
+            height: 40px;
+            margin-left: 170px;
+        }
+
+        .other {
+            width: 350px;
+            margin: 20px auto;
+
+        }
+
+        .other a {
+            color: rgb(51, 51, 51);
+            line-height: 30px;
+            margin: auto 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="info">
+        <p class="tishi">忘记密码？</p>
+    </div>
+    <div class="forget">
+        <form>
+            <input type="email" class="form-control email" placeholder="请输入您的邮箱" onblur="checkemail()">
+            <img src="check_right.gif" alt="" class="dui1" style="display: none"/>
+            <img src="check_error.gif" alt="" class="cuo1" style="display: none"/>
+            <input type="text" class="form-control" id="identifyingcode" placeholder="验证码" onblur="checkcode()">
+            <img src="../yanzhenma" alt="验证码" id="identifyingimg" onclick="reloadcode()"/>
+            <img src="check_right.gif" style="display: none" alt="" class="dui2"/>
+            <img src="check_error.gif" style="display: none" alt="" class="cuo2"/>
+            <button class="btn btn-primary" type="button" onclick="sendmail()">确定</button>
+        </form>
+    </div>
+    <div class="other">
+        <a href="/12.8login/login/loginpage.html" id="login">&larr; 回到登录页面</a>
+    </div>
+</div>
+<script>
+
+    var check = false;
+
+    var yanzhen = false;
+
+    function checkemail() {
+        var email = $(".email").val();
+        var re = /^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/;
+        if (email != "") {
+            if (re.test(email)) {
+                $(".tishi").html("当前邮箱格式正确");
+                $(".cuo1").hide();
+                $(".dui1").show();
+                $(".info").css({
+                    "border-left-color":"limegreen"
+                });
+                check = true;
+            } else {
+                $(".tishi").html("当前邮箱格式有误");
+                $(".dui1").hide();
+                $(".cuo1").show();
+                $(".info").css({
+                    "border-left-color":"red"
+                });
+                check = false;
+            }
+        } else {
+            $(".tishi").html("邮箱不能为空");
+            $(".dui1").hide();
+            $(".cuo1").show();
+            $(".info").css({
+                "border-left-color":"red"
+            });
+            check = false;
+        }
+    }
+
+    function checkcode() {
+
+        var code = $("#identifyingcode").val();
+        if (code != "") {
+            var url = "../sever?method=checkyanzhenma";
+            $.post(url, {
+                code: code,
+            }, function (data) {
+                if (data == 1) {
+                    $(".tishi").html("验证码正确");
+                    $(".cuo2").hide();
+                    $(".dui2").show();
+                    $(".info").css({
+                        "border-left-color":"limegreen"
+                    });
+                    yanzhen = true;
+                } else {
+                    $(".tishi").html("验证码错误");
+                    $(".dui2").hide();
+                    $(".cuo2").show();
+                    $(".info").css({
+                        "border-left-color":"red"
+                    });
+                    yanzhen = false;
+                }
+            })
+        } else {
+            $(".tishi").html("请输入验证码");
+            $(".dui2").hide();
+            $(".cuo2").show();
+            $(".info").css({
+                "border-left-color":"red"
+            });
+            yanzhen = false;
+        }
+    }
+
+    function reloadcode() {
+        var now = new Date().getTime();
+        $("#identifyingcode").val("");
+        $("#identifyingimg").attr("src", "../yanzhenma?id=" + now);
+        $(".dui2").hide();
+        $(".cuo2").hide();
+        yanzhen = false;
+    }
+
+    function sendmail() {
+        if (yanzhen == true && check == true) {
+            var newurl = "../sever?method=resetpassword";
+            $.post(newurl, {
+                resetuseremail: $(".email").val(),
+            }, function (data) {
+                if (data == 1) {
+                    $(".tishi").html("重置邮件已发送，请查收");
+                    yanzhen = false;
+                    $(".dui1").hide();
+                    $(".cuo1").hide();
+                    $(".dui2").hide();
+                    $(".cuo2").hide();
+                    $(".info").css({
+                        "border-left-color":"limegreen"
+                    });
+                    reloadcode();
+                }
+                if (data == 0) {
+                    $(".tishi").html("当前邮箱未被注册，请重试");
+                    yanzhen = false;
+                    $(".dui1").hide();
+                    $(".cuo1").hide();
+                    $(".dui2").hide();
+                    $(".cuo2").hide();
+                    $(".info").css({
+                        "border-left-color":"red"
+                    });
+                    reloadcode();
+                }
+                if((data != 1) && (data !=0)) {
+                    $(".tishi").html("邮件发送失败，请稍后再试");
+                    yanzhen = false;
+                    $(".dui1").hide();
+                    $(".cuo1").hide();
+                    $(".dui2").hide();
+                    $(".cuo2").hide();
+                    $(".info").css({
+                        "border-left-color":"red"
+                    });
+                    reloadcode();
+                }
+            })
+        } else {
+            $(".tishi").html("请完善您的信息");
+            reloadcode();
+            $(".dui1").hide();
+            $(".cuo1").hide();
+            $(".dui2").hide();
+            $(".cuo2").hide();
+            $(".info").css({
+                "border-left-color":"red"
+            });
+        }
+    }
+</script>
+</body>
+</html>

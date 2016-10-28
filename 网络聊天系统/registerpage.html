@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="bootstrap.css">
+    <script src="jquery-2.1.4.min.js"></script>
+    <style>
+        body{
+            background-image: url("background.jpg") ;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        .info{
+            width: 350px;
+            height: 50px;
+            margin: 0 auto;
+            margin-top: 2cm;
+            padding: 10px 20px;
+            background-color: rgba(255,255,255,0.4);
+            box-shadow:0 0 10px grey ;
+            border-left: 7px solid deepskyblue;
+        }
+        .info p {
+            font-size: 20px;
+            line-height: 30px;
+        }
+        .register{
+            width: 350px;
+            margin: 0 auto;
+            margin-top: 20px;
+            padding: 40px;
+            background-color: rgba(255,255,255,0.4);
+            box-shadow:0 0 10px grey ;
+        }
+        .form-control{
+            width: 240px;
+            margin-bottom: 20px;
+            height: 40px;
+            font-size: 16px;
+            display: inline-block;
+        }
+        form button{
+            width: 70px;
+            height: 40px;
+            margin-left: 170px;
+        }
+        #identifyingcode{
+            width: 120px;
+            display: inline-block;
+            margin-right: 17px;
+        }
+        #identifyingimg{
+            width: 100px;
+            height: 40px;
+            position: relative;
+            bottom: 1px;
+        }
+        /*显示图标*/
+        .dui1,.dui2,.dui3,.dui4,.dui5,.cuo1,.cuo2,.cuo3,.cuo4,.cuo5 {
+            display: inline-block;
+            margin-left: 10px;
+            width: 16px;
+            height: 16px;
+            float: right;
+            position: relative;
+            top: 10px;
+        }
+        .other {
+            width: 350px;
+            margin: 20px auto;
+
+        }
+        .other a{
+            color: rgb(51,51,51);
+            line-height: 30px;
+            margin:auto 10px;
+        }
+        span{
+            color: rgb(51,51,51);
+            position: relative;
+            bottom: 1px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="info">
+        <p class="tishi">请注册</p>
+    </div>
+    <div class="register">
+        <form>
+            <input type="text" class="form-control" id="username" placeholder="请输入您的用户名" onblur="zhanghao()">
+            <img src="check_right.gif" alt="" class="dui1" style="display: none"/>
+            <img src="check_error.gif" alt="" class="cuo1" style="display: none"/>
+
+            <input type="password" class="form-control" id="password" placeholder="请输入您的密码" onblur="checkpassword()">
+            <img src="check_right.gif" alt="" class="dui2" style="display: none"/>
+            <img src="check_error.gif" alt="" class="cuo2" style="display: none"/>
+
+            <input type="password" class="form-control" id="passwordagain" placeholder="请再次输入您的密码" onblur="checkpasswordagain()">
+            <img src="check_right.gif" alt="" class="dui3" style="display: none"/>
+            <img src="check_error.gif" alt="" class="cuo3" style="display: none"/>
+
+            <input type="email" class="form-control" id="email" placeholder="请输入您的邮箱" onblur="checkemail()">
+            <img src="check_right.gif" alt="" class="dui4" style="display: none"/>
+            <img src="check_error.gif" alt="" class="cuo4" style="display: none"/>
+
+            <input type="text" class="form-control" id="identifyingcode" placeholder="验证码" onblur="checkcode()">
+            <img src="../yanzhenma" alt="" id="identifyingimg" onclick="reloadcode()"/>
+            <img src="check_right.gif" alt="" class="dui5" style="display: none"/>
+            <img src="check_error.gif" alt="" class="cuo5" style="display: none"/>
+            <button class="btn btn-primary" type="button" onclick="getbuttomok()">注册</button>
+        </form>
+    </div>
+    <div class="other">
+        <a href="/12.8login/login/loginpage.html" id="login">登录</a><span>|</span>
+        <a href="/12.8login/login/resetpass.html" id="forgetpassword">忘记密码?<br></a>
+        <a href="/12.8login/login/loginpage.html" id="backtohome">&larr; 回到主页</a>
+    </div>
+</div>
+
+<script>
+    var first = false;
+    var second = false;
+    var third = false;
+    var fourth = false;
+    var fifth = false;
+
+    var oldname = null;
+
+    var oldemail = null;
+
+    function zhanghao() {
+        var checkregistername = $("#username").val();
+        if(checkregistername != oldname){
+            var re = /^[a-zA-z]\w{5,15}$/;
+            if (re.test(checkregistername)){//test() 方法用于检测一个字符串是否匹配某个模式.
+                var url = "../sever?method=checkregistername";
+                $.post(url, {
+                    registername : checkregistername
+                }, function(data) {
+                    {
+                        if ((data == 1) && (checkregistername != null)) {
+                            $(".tishi").html("当前账号已经存在，请重新输入");
+                            $(".info").css({
+                                "border-left-color":"red"
+                            });
+                            $(".dui1").hide();
+                            $(".cuo1").show();
+                            first = false;
+                        } else {
+                            $(".tishi").html("当前账号可用");
+                            $(".cuo1").hide();
+                            $(".dui1").show();
+                            $(".info").css({
+                                "border-left-color":"limegreen"
+                            });
+                            first = true;
+                        }
+                    }
+                })
+            }else {
+                $(".tishi").html("<p style='font-size: 16px;'>"+"由字母,数字,下划线组成,字母开头,6-16位"+"</p>");
+                $(".dui1").hide();
+                $(".cuo1").show();
+                $(".info").css({
+                    "border-left-color":"red"
+                });
+                first = false;
+            }
+            oldname = checkregistername;
+        }
+    }
+
+    function checkpassword(){
+        var password = $("#password").val();
+        var passwordagain = $("#passwordagain").val();
+        var re = /^[0-9a-zA-z_]{6,20}$/;
+        if(re.test(password)){
+            $(".tishi").html("密码验证通过");
+            $(".info").css({
+                "border-left-color":"limegreen"
+            });
+            $(".cuo2").hide();
+            $(".dui2").show();
+            second = true;
+            if((password != passwordagain) && (passwordagain != "")){
+                checkpasswordagain();
+            }
+            if((password == passwordagain) && (passwordagain != "")){
+                checkpasswordagain();
+            }
+        }else{
+//            <p style='font-size: 18px;'>"+"密码可使用字母,数字,下划线,6-20位"+"</p>
+            $(".tishi").html("<p style='font-size: 18px;'>"+"密码可使用字母,数字,下划线,6-20位"+"</p>");
+            $(".dui2").hide();
+            $(".cuo2").show();
+            $(".info").css({
+                "border-left-color":"red"
+            });
+            second = false;
+        }
+    }
+
+    function checkpasswordagain() {
+        var password = $("#password").val();
+        var passwordagain = $("#passwordagain").val();
+        if ((password != passwordagain) && (passwordagain != null) && (password != null)) {
+            $(".tishi").html("两次密码不一致");
+            $(".dui3").hide();
+            $(".cuo3").show();
+            $(".info").css({
+                "border-left-color":"red"
+            });
+            third = false;
+        }
+        if((password == passwordagain) && (passwordagain != "") && (password != "")){
+            $(".tishi").html("密码验证通过");
+            $(".cuo3").hide();
+            $(".dui3").show();
+            $(".info").css({
+                "border-left-color":"limegreen"
+            });
+            third = true;
+        }
+        if((password != "") && (passwordagain == "")){
+            $(".tishi").html("密码不能为空");
+            $(".dui3").hide();
+            $(".cuo3").show();
+            $(".info").css({
+                "border-left-color":"red"
+            });
+            third = false;
+        }
+        if((password == "")){
+            $(".tishi").html("密码不能为空");
+            $(".dui2").hide();
+            $(".cuo2").show();
+            $(".info").css({
+                "border-left-color":"red"
+            });
+            second = false;
+        }
+    }
+
+    function checkemail() {
+        var checkregisteremail = $("#email").val();
+        if(checkregisteremail != ""){
+            if(checkregisteremail != oldemail){
+                var re = /^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/;
+                if (re.test(checkregisteremail)) {
+                    var url = "../sever?method=checkregisteremail";
+                    $.post(url, {
+                        registeremail : checkregisteremail
+                    }, function(data) {
+                        if ((data == 1) && (checkregisteremail != null)) {
+                            $(".tishi").html("当前邮箱已经被使用，请重新输入");
+                            $(".dui4").hide();
+                            $(".cuo4").show();
+                            $(".info").css({
+                                "border-left-color":"red"
+                            });
+                            fourth = false;
+                        } else {
+                            $(".tishi").html("当前邮箱可以使用");
+                            $(".cuo4").hide();
+                            $(".dui4").show();
+                            $(".info").css({
+                                "border-left-color":"limegreen"
+                            });
+                            fourth = true;
+                        }
+                    })
+                }else {
+                    $(".tishi").html("当前邮箱格式有误");
+                    $(".dui4").hide();
+                    $(".cuo4").show();
+                    $(".info").css({
+                        "border-left-color":"red"
+                    });
+                    fourth = false;
+                }
+                oldemail = checkregisteremail;
+            }
+        }else{
+            $(".tishi").html("邮箱不能为空");
+            $(".dui4").hide();
+            $(".cuo4").show();
+            $(".info").css({
+                "border-left-color":"red"
+            });
+            fourth = false;
+        }
+    }
+
+    function checkcode(){
+        var code = $("#identifyingcode").val();
+        if(code != ""){
+            var url = "../sever?method=checkyanzhenma";
+            $.post(url, {
+                code: code,
+            }, function (data) {
+                if (data == 1) {
+                    $(".tishi").html("验证码正确");
+                    $(".cuo5").hide();
+                    $(".dui5").show();
+                    $(".info").css({
+                        "border-left-color":"limegreen"
+                    });
+                    fifth = true;
+                }else{
+                    $(".tishi").html("验证码错误");
+                    $(".dui5").hide();
+                    $(".cuo5").show();
+                    $(".info").css({
+                        "border-left-color":"red"
+                    });
+                    fifth = false;
+                }
+            })
+        }else{
+            $(".tishi").html("请输入验证码");
+            $(".dui5").hide();
+            $(".cuo5").show();
+            $(".info").css({
+                "border-left-color":"red"
+            });
+            fifth = false;
+        }
+    }
+
+    function reloadcode(){
+        var now = new Date().getTime();
+        $("#identifyingcode").val("");
+        $("#identifyingimg").attr("src","../yanzhenma?id="+now);
+        $(".dui5").hide();
+        $(".cuo5").hide();
+        fifth = false;
+    }
+
+    window.onload = function(){
+        reloadcode();
+    }
+
+    function register() {
+        var checkregistername = $("#username").val();
+        var url = "../sever?method=checkregistername";
+        $.post(url, {
+            registername : checkregistername
+        }, function(data) {
+            {
+                if ((data == 1) && (checkregistername != null)) {
+                    $(".tishi").html("当前账号已经存在，请重新输入");
+                    $(".dui1").hide();
+                    $(".cuo1").show();
+                    $(".info").css({
+                        "border-left-color":"red"
+                    });
+                    first = false;
+                } else {
+                    $(".tishi").html("当前账号可用");
+                    $(".cuo1").hide();
+                    $(".dui1").show();
+                    $(".info").css({
+                        "border-left-color":"limegreen"
+                    });
+                    first = true;
+                    var newurl = "../sever?method=register";
+                    $.post(newurl, {
+                        registername: $("#username").val(),
+                        registerpass: $("#password").val(),
+                        registeremail: $("#email").val()
+                    }, function (data) {
+                        if (data == 1) {
+                            $(".tishi").html("邮件已发送至注册邮箱，请查收");
+                            $(".info").css({
+                                "border-left-color":"limegreen"
+                            });
+                        }else{
+                            $(".tishi").html("注册失败，请稍后再试");
+                            $(".info").css({
+                                "border-left-color":"red"
+                            });
+                        }
+                    })
+                }
+            }
+        })
+    }
+
+    function getbuttomok() {
+        if (first == true && second == true && third == true && fourth == true && fifth == true) {
+            register();
+            reloadcode();
+        }else{
+            $(".xianshi").html("请完善您的注册信息");
+            $(".info").css({
+                "border-left-color":"red"
+            });
+            reloadcode();
+        }
+    }
+
+</script>
+</body>
+</html>

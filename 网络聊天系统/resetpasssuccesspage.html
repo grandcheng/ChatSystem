@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>重置密码成功</title>
+    <link rel="stylesheet" type="text/css" href="bootstrap.css">
+    <script src="jquery-2.1.4.min.js"></script>
+    <style>
+        body {
+            background-image: url("background.jpg");
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .info {
+            width: 350px;
+            height: 200px;
+            margin: 0 auto;
+            margin-top: 5cm;
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 10px grey;
+            border-left: 7px solid limegreen;
+        }
+
+        .timearea {
+            text-align: center;
+            margin: 75px auto;
+            font-size: 20px;
+            line-height: 30px;
+        }
+
+        .other {
+            width: 350px;
+            margin: 20px auto;
+        }
+
+        .other a {
+            color: rgb(51, 51, 51);
+            line-height: 30px;
+            margin: auto 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="info">
+        <div class="timearea"><spam>重置成功！</spam>
+
+            <span class="shijian">3</span>
+
+            <span>秒后跳转</span></div>
+    </div>
+    <div class="other">
+        <a href="#" id="login">&larr; 回到登录页面</a>
+    </div>
+</div>
+<script>
+    var lesstime = 3;
+    var mytime;
+    mytime = setInterval(gettime, 1000);
+    function gettime() {
+        if (lesstime > 0) {
+            lesstime--;
+            $(".shijian").html(lesstime);
+        }else{
+            window.location.href = "/12.8login/login/loginpage.html";
+        }
+    }
+</script>
+</body>
+</html>
